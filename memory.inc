@@ -1,0 +1,13 @@
+; vim: set syntax=asm_ca65:
+
+PPU_CTRL = $2000
+PPU_MASK = $2001
+PPU_STAT = $2002
+PPU_ADDR = $2006
+PPU_DATA = $2007
+OAM_ADDR = $2003
+OAM_DMA  = $4014
+
+BG_COLOR_HI = $3f
+BG_COLOR_LO = $00
+
