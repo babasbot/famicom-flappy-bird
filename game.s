@@ -36,24 +36,53 @@
   LDX #$00
   STX PPU_CTRL
   STX PPU_MASK
-vblankwait:
-  BIT PPU_STAT
-  BPL vblankwait
-  JMP main
 .endproc
 
 .proc main
+preload_bg_palette:
   LDX PPU_STAT
-
-  LDX #$3f
+  LDX #$3f ; BG_PALETTE_0 high nibble
   STX PPU_ADDR
-  LDX #00
+  LDX #$00 ; BG_PALETTE_0 low nibble
   STX PPU_ADDR
 
-  LDA #AZURE_3
+load_bg_palette:
+  LDA bg_palettes,X
   STA PPU_DATA
+  INX
+  CPX #$0f
+  BNE load_bg_palette
 
-  LDA #%00011110
+preload_fg_palette:
+  LDX PPU_STAT
+  LDX #$3f ; FG_PALETTE_0 high nibble
+  STX PPU_ADDR
+  LDX #$10 ; FG_PALETTE_0 low nibble
+  STX PPU_ADDR
+  LDX #$00
+
+load_fg_palette:
+  LDA fg_palettes,X
+  STA PPU_DATA
+  INX
+  CPX #$08
+  BNE load_fg_palette
+
+LDX #$00
+load_sprites:
+  LDA sprites,X
+  STA $0200,X
+  INX
+  CPX #$18
+  BNE load_sprites
+
+vblankwait:
+  BIT PPU_STAT
+  BPL vblankwait
+
+  LDA #%10010000  ; turn on NMIs, sprites use first pattern table
+  STA PPU_CTRL
+  LDA #%00011110  ; turn on screen
   STA PPU_MASK
 
 forever:
@@ -64,6 +93,31 @@ forever:
 .word nmi_handler
 .word reset_handler
 .word irq_handler
+
+.segment "RODATA"
+bg_palettes:
+.byte AZURE_3, BLACK_4, GRAY_3,   YELLOW_3 ; bg palette 0
+.byte AZURE_3, BLACK_4, YELLOW_3, RED_1    ; bg palette 1
+.byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; bg palette 2
+.byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; bg palette 3
+
+fg_palettes:
+.byte AZURE_3, BLACK_4, GRAY_3,   YELLOW_3 ; fg palette 0
+.byte AZURE_3, BLACK_4, YELLOW_3, RED_1    ; fg palette 1
+.byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; fg palette 2
+.byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; fg palette 3
+
+sprites:
+.byte $70, $00, $00, $70
+.byte $70, $01, $00, $78
+.byte $70, $02, $00, $80
+.byte $78, $10, $00, $70
+.byte $78, $11, $00, $78
+.byte $78, $12, $01, $80
+;       │    │    │    └── x-coord
+;       │    │    └─────── sprite attributes
+;       │    └──────────── tile number
+;       └───────────────── y-coord
 
 .segment "CHR"
 .incbin "graphics.chr"
