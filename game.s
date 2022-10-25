@@ -1,7 +1,7 @@
 ; vim: set syntax=asm_ca65:
 
 .include "palette.inc"
-.include "memory.inc"
+.include "addresses.inc"
 
 ; For more details on the iNES header format, see:
 ; - https://www.nesdev.org/wiki/NES_2.0
