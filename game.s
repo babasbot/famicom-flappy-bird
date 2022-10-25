@@ -43,14 +43,11 @@ vblankwait:
 .endproc
 
 .proc main
-
-set_bg:
   LDX PPU_STAT
 
-  LDX #BG_COLOR_HI
+  LDX #$3f
   STX PPU_ADDR
-
-  LDX #BG_COLOR_LO
+  LDX #00
   STX PPU_ADDR
 
   LDA #AZURE_3
