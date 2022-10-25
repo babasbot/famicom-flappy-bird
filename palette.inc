@@ -1,15 +1,16 @@
 ; vim: set syntax=asm_ca65:
 
 ;
-; Color Palette
+;    Palette
 ;
-
 ;    x0      x1      x2      x3      x4      x5      x6      x7      x8      x9      xA      xB      xC      xD
 ;    ------- ------- ------- ------- ------- ------- ------- ------- ------- ------- ------- ------- ------- -------
 ; 0x #545454 #03216F #031A8A #2A1182 #3D0E60 #540D2F #4D0D05 #381A05 #222906 #19380A #183D0C #163A0B #10313B #000000
 ; 1x #989698 #1B4FBD #2B3DE3 #5231DB #7C2AAA #932762 #8C2C26 #713F13 #555918 #3E6F1D #377920 #327332 #296576 #000000
 ; 2x #ECEEEC #5E9AE5 #777FE5 #A56BE4 #D363E5 #DB64B0 #DD7169 #CA8A3A #A2A835 #87C03A #73CB45 #68C876 #5DB2C9 #3C3C3C
 ; 3x #ECEEEC #AECBE9 #BCBDE8 #CEB4E8 #E2B2E8 #E2B1D2 #E4B6B2 #DFC496 #CDD083 #BDDB84 #B4DF98 #A8DFB7 #ABD5E2 #A0A2A0
+;
+; For further details see: https://www.nesdev.org/wiki/PPU_palettes
 
 GRAY_0 = $00       ; #545454
 GRAY_1 = $10       ; #989698

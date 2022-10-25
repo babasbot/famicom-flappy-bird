@@ -1,6 +1,6 @@
 ; vim: set syntax=asm_ca65:
 
-.include "colors.inc"
+.include "palette.inc"
 .include "memory.inc"
 
 ; For more details on the iNES header format, see:
