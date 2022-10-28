@@ -27,6 +27,11 @@
   STA OAM_ADDR
   LDA #$02
   STA OAM_DMA
+
+  LDX $20
+  INX
+  STX $20
+
   RTI
 .endproc
 
@@ -68,14 +73,6 @@ load_fg_palette:
   CPX #$08
   BNE load_fg_palette
 
-LDX #$00
-load_sprites:
-  LDA sprites,X
-  STA $0200,X
-  INX
-  CPX #$18
-  BNE load_sprites
-
 vblankwait:
   BIT PPU_STAT
   BPL vblankwait
@@ -85,8 +82,52 @@ vblankwait:
   LDA #%00011110  ; turn on screen
   STA PPU_MASK
 
-forever:
-  JMP forever
+initial_position:
+  LDX #70
+  STX $20
+
+  LDX #78
+  STX $21
+
+LDX #$00
+
+loop:
+
+render_flappy_bird_sprite_top_0:
+LDX $20
+STX $0200
+
+LDX $00
+flappybird_top_0:
+  LDA flappybird_sprite_top_0,X
+  STA $0201,X
+  INX
+  CPX #$03
+  BNE flappybird_top_0
+
+LDX $20
+STX $0204
+
+LDX $00
+flappybird_top_1:
+  LDA flappybird_sprite_top_1,X
+  STA $0205,X
+  INX
+  CPX #$03
+  BNE flappybird_top_1
+
+LDX $20
+STX $0208
+
+LDX $00
+flappybird_top_2:
+  LDA flappybird_sprite_top_2,X
+  STA $0209,X
+  INX
+  CPX #$03
+  BNE flappybird_top_2
+
+JMP loop
 .endproc
 
 .segment "VECTORS"
@@ -107,17 +148,28 @@ fg_palettes:
 .byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; fg palette 2
 .byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; fg palette 3
 
-sprites:
-.byte $70, $00, $00, $70
-.byte $70, $01, $00, $78
-.byte $70, $02, $00, $80
-.byte $78, $10, $00, $70
-.byte $78, $11, $00, $78
-.byte $78, $12, $01, $80
+flappybird_sprite_top_0:
+.byte $00, $00, $70
+
+flappybird_sprite_top_1:
+.byte $01, $00, $78
+
+flappybird_sprite_top_2:
+.byte $02, $00, $80
+
 ;       │    │    │    └── x-coord
 ;       │    │    └─────── sprite attributes
 ;       │    └──────────── tile number
-;       └───────────────── y-coord
+;       └───────────────── y-coord (dynamic)
+
+flappy_bird_bottom:
+.byte       $10, $00, $70
+.byte       $11, $00, $78
+.byte       $12, $01, $80
+;       │    │    │    └── x-coord
+;       │    │    └─────── sprite attributes
+;       │    └──────────── tile number
+;       └───────────────── y-coord (dynamic)
 
 .segment "CHR"
 .incbin "graphics.chr"
