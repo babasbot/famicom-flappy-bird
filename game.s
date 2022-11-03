@@ -22,11 +22,29 @@
 .endproc
 
 .proc nmi_handler
-  ; Initiate a high-speed transfer of the 256 bytes from $0200 to $02ff into OAM
   LDA #$00
   STA OAM_ADDR
   LDA #$02
   STA OAM_DMA
+
+gravity:
+  LDY $0200
+  CPY #$d8
+  BCS end_nmi
+
+  TYA
+  ADC #3
+  STA $0200
+  STA $0204
+  STA $0208
+
+  LDA $020c
+  ADC #3
+  STA $020c
+  STA $0210
+  STA $0214
+
+end_nmi:
   RTI
 .endproc
 
@@ -36,6 +54,16 @@
   LDX #$00
   STX PPU_CTRL
   STX PPU_MASK
+.endproc
+
+.proc draw_flappybird
+  LDX #$00
+  draw_sprites:
+    LDA flappybird_sprites,X
+    STA $0200,X
+    INX
+    CPX #$18
+    BNE draw_sprites
 .endproc
 
 .proc main
@@ -68,14 +96,6 @@ load_fg_palette:
   CPX #$08
   BNE load_fg_palette
 
-LDX #$00
-load_sprites:
-  LDA sprites,X
-  STA $0200,X
-  INX
-  CPX #$18
-  BNE load_sprites
-
 vblankwait:
   BIT PPU_STAT
   BPL vblankwait
@@ -107,7 +127,7 @@ fg_palettes:
 .byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; fg palette 2
 .byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; fg palette 3
 
-sprites:
+flappybird_sprites:
 .byte $70, $00, $00, $70
 .byte $70, $01, $00, $78
 .byte $70, $02, $00, $80
