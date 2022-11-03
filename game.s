@@ -105,6 +105,26 @@ vblankwait:
   LDA #%00011110  ; turn on screen
   STA PPU_MASK
 
+;
+; Write the PPU attribute table
+;
+
+LDA PPU_STAT
+
+LDA #$23
+STA PPU_ADDR
+LDA #$e8
+STA PPU_ADDR
+
+LDX #$00
+
+write_ppu_attribute_table:
+  LDA ppu_attribute_table,X
+  STA PPU_DATA
+  INX
+  CPX #$18
+  BNE write_ppu_attribute_table
+
 forever:
   JMP forever
 .endproc
@@ -139,6 +159,54 @@ flappybird_sprites:
 ;       │    │    └─────── sprite attributes
 ;       │    └──────────── tile number
 ;       └───────────────── y-coord
+
+name_table:
+  .byte $1b, $1c, $00, $00
+  .byte $00, $1b, $1c, $00
+
+ppu_attribute_table:
+
+  ; 76 54 32 10
+  ; || || || ||
+  ; || || || ++-- top left palette
+  ; || || ++----- top right palette
+  ; || ++-------- bottom left palette
+  ; ++----------- bottom right palette
+  ;
+  ; with:
+  ;   - %00 → palette 0
+  ;   - %01 → palette 1
+  ;   - %10 → palette 2
+  ;   - %11 → palette 3
+  ;
+  ; See: https://www.nesdev.org/wiki/PPU_attribute_tables
+
+  .byte %11111111 ; $23e8
+  .byte %11111111 ; $23e9
+  .byte %11111111 ; $23ea
+  .byte %11111111 ; $23eb
+  .byte %11111111 ; $23ec
+  .byte %11111111 ; $23ed
+  .byte %11111111 ; $23ee
+  .byte %11111111 ; $23ef
+
+  .byte %00000000 ; $23f0
+  .byte %00000000 ; $23f1
+  .byte %00000000 ; $23f2
+  .byte %00000000 ; $23f3
+  .byte %00000000 ; $23f4
+  .byte %00000000 ; $23f5
+  .byte %00000000 ; $23f6
+  .byte %00000000 ; $23f7
+
+  .byte %01010101 ; $23f8
+  .byte %01010101 ; $23f9
+  .byte %01010101 ; $23fa
+  .byte %01010101 ; $23fb
+  .byte %01010101 ; $23fc
+  .byte %01010101 ; $23fd
+  .byte %01010101 ; $23fe
+  .byte %01010101 ; $23ff
 
 .segment "CHR"
 .incbin "graphics.chr"
