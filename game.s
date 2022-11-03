@@ -115,11 +115,12 @@ forever:
 .word irq_handler
 
 .segment "RODATA"
+
 bg_palettes:
-.byte AZURE_3, BLACK_4, GRAY_3,   YELLOW_3 ; bg palette 0
-.byte AZURE_3, BLACK_4, YELLOW_3, RED_1    ; bg palette 1
-.byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; bg palette 2
-.byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; bg palette 3
+  .byte AZURE_3, GREEN_3,      CHARTREUSE_2, CHARTREUSE_1 ; 0: #AECBE9 #B4DF98 #87C03A #3E6F1D
+  .byte AZURE_3, CHARTREUSE_1, ORANGE_2,     ORANGE_3     ; 1: #AECBE9 #87C03A #CA8A3A #DFC497
+  .byte AZURE_3, GREEN_3,      CHARTREUSE_1, SPRING_3     ; 2: #AECBE9 #B4DF98 #3E6F1D #A8DFB7
+  .byte AZURE_3, GRAY_2,       CHARTREUSE_1, AZURE_3      ; 3: #AECBE9 #ECEEEC #3E6F1D #AECBE9
 
 fg_palettes:
 .byte AZURE_3, BLACK_4, GRAY_3,   YELLOW_3 ; fg palette 0
