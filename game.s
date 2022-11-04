@@ -1,6 +1,5 @@
 ; vim: set syntax=asm_ca65:
 
-.include "palette.inc"
 .include "addresses.inc"
 
 ; For more details on the iNES header format, see:
@@ -67,27 +66,23 @@ end_nmi:
 .endproc
 
 .proc main
-preload_bg_palette:
-  LDX PPU_STAT
-  LDX #$3f ; BG_PALETTE_0 high nibble
-  STX PPU_ADDR
-  LDX #$00 ; BG_PALETTE_0 low nibble
-  STX PPU_ADDR
 
-load_bg_palette:
-  LDA bg_palettes,X
+;
+; write palettes
+;
+
+LDX PPU_STAT
+LDX #$3f
+STX PPU_ADDR
+LDX #$00
+STX PPU_ADDR
+
+write_palette:
+  LDA palettes,X
   STA PPU_DATA
   INX
-  CPX #$0f
-  BNE load_bg_palette
-
-preload_fg_palette:
-  LDX PPU_STAT
-  LDX #$3f ; FG_PALETTE_0 high nibble
-  STX PPU_ADDR
-  LDX #$10 ; FG_PALETTE_0 low nibble
-  STX PPU_ADDR
-  LDX #$00
+  CPX #$20
+  BNE write_palette
 
 load_fg_palette:
   LDA fg_palettes,X
@@ -136,17 +131,16 @@ forever:
 
 .segment "RODATA"
 
-bg_palettes:
-  .byte AZURE_3, GREEN_3,      CHARTREUSE_2, CHARTREUSE_1 ; 0: #AECBE9 #B4DF98 #87C03A #3E6F1D
-  .byte AZURE_3, CHARTREUSE_1, ORANGE_2,     ORANGE_3     ; 1: #AECBE9 #87C03A #CA8A3A #DFC497
-  .byte AZURE_3, GREEN_3,      CHARTREUSE_1, SPRING_3     ; 2: #AECBE9 #B4DF98 #3E6F1D #A8DFB7
-  .byte AZURE_3, GRAY_2,       CHARTREUSE_1, AZURE_3      ; 3: #AECBE9 #ECEEEC #3E6F1D #AECBE9
+palettes:
+  .byte $31, $3a, $29, $19 ; bg 0 #AECBE9 #B4DF98 #87C03A #3E6F1D
+  .byte $31, $19, $27, $37 ; bg 1 #AECBE9 #87C03A #CA8A3A #DFC497
+  .byte $31, $3a, $19, $3b ; bg 2 #AECBE9 #B4DF98 #3E6F1D #A8DFB7
+  .byte $31, $20, $19, $31 ; bg 3 #AECBE9 #ECEEEC #3E6F1D #AECBE9
 
-fg_palettes:
-.byte AZURE_3, BLACK_4, GRAY_3,   YELLOW_3 ; fg palette 0
-.byte AZURE_3, BLACK_4, YELLOW_3, RED_1    ; fg palette 1
-.byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; fg palette 2
-.byte AZURE_3, AZURE_3, AZURE_3,  AZURE_3  ; fg palette 3
+  .byte $31, $0d, $30, $38 ; fg 0 #AECBE9 #000000 #ECEEEC #CDD083
+  .byte $31, $0d, $38, $16 ; fg 1 #AECBE9 #000000 #CDD083 #8C2C26
+  .byte $31, $31, $31, $31 ; fg 2 #AECBE9 #AECBE9 #AECBE9 #AECBE9
+  .byte $31, $31, $31, $31 ; fg 3 #AECBE9 #AECBE9 #AECBE9 #AECBE9
 
 flappybird_sprites:
 .byte $70, $00, $00, $70
