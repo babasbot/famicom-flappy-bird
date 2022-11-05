@@ -44,7 +44,7 @@
   ; Initialize zero-page
   ;
 
-  LDA $70
+  LDA #$70
   STA flappybird_y_coord
 
   JMP main
@@ -209,13 +209,14 @@ forever:
   ;
 
 
-  LDA #$70
+  LDA flappybird_y_coord
 
   STA $0200 ; tile 0
   STA $0204 ; tile 1
   STA $0208 ; tile 2
 
-  LDA #$78
+  CLC
+  ADC #$08
 
   STA $020c ; tile 3
   STA $0210 ; tile 4
