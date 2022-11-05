@@ -148,20 +148,7 @@ write_ppu_attribute_table_namespace_1:
   CPX #$20
   BNE write_ppu_attribute_table_namespace_1
 
-
-;
-; draws FlappyBird in its initial position
-;
-;
-
-LDX #$00
-
-draw_flappybird:
-  LDA flappybird_sprites,X
-  STA $0200,X
-  INX
-  CPX #$18
-  BNE draw_flappybird
+JSR draw_flappybird
 
 vblank_wait:       ; wait for another vblank before continuing
   BIT PPU_STAT
@@ -174,6 +161,122 @@ vblank_wait:       ; wait for another vblank before continuing
 
 forever:
   JMP forever
+.endproc
+
+.proc draw_flappybird
+  PHP
+  PHA
+  TXA
+  PHA;
+  TYA
+  PHA;
+
+  ;       xx00 xx01 xx02 xx03
+  ; $02xx $70  $03  $00  $70
+  ;
+  ;       xx04 xx05 xx06 xx07
+  ; $02xx $70  $01  $00  $78
+  ;
+  ;       xx08 xx09 xx0a xx0b
+  ; $02xx $70  $02  $00  $80
+  ;
+  ;       xx0c xx0d xx0e xx0f
+  ; $02xx $78  $10  $00  $70
+  ;
+  ;       xx10 xx11 xx12 xx13
+  ; $02xx $78  $11  $00  $78
+  ;
+  ;       xx14 xx15 xx16 xx17
+  ; $02xx $78  $12  $01  $80
+  ;
+  ;       │    │    │    └── x-coord
+  ;       │    │    └─────── sprite attributes
+  ;       │    └──────────── tile number
+  ;       └───────────────── y-coord
+  ;
+
+  ;
+  ; Write FlappyBird y-coordinates
+  ;
+
+
+  LDA #$70
+
+  STA $0200 ; tile 0
+  STA $0204 ; tile 1
+  STA $0208 ; tile 2
+
+  LDA #$78
+
+  STA $020c ; tile 3
+  STA $0210 ; tile 4
+  STA $0214 ; tile 5
+
+  ;
+  ; Write FlappyBird tile numbers
+  ;
+
+  LDA #$03
+  STA $0201 ; tile 0
+
+  LDA #$01
+  STA $0205 ; tile 1
+
+  LDA #$02
+  STA $0209 ; tile 2
+
+  LDA #$10
+  STA $020d ; tile 3
+
+  LDA #$11
+  STA $0211 ; tile 4
+
+  LDA #$12
+  STA $0215 ; tile 5
+
+  ;
+  ; Write FlappyBird sprite attributes
+  ;
+
+  LDA #$00  ; palette 0
+
+  STA $0202 ; tile 0
+  STA $0206 ; tile 1
+  STA $020a ; tile 2
+  STA $020e ; tile 3
+  STA $0212 ; tile 4
+
+  LDA #$01  ; palette 1
+
+  STA $0216 ; tile 5
+
+  ;
+  ; Write FlappyBird x-coordinates
+  ;
+
+  LDA #$70
+
+  STA $0203 ; tile 0
+  STA $020f ; tile 3
+
+  LDA #$78
+
+  STA $0207 ; tile 1
+  STA $0213 ; tile 4
+
+  LDA #$80
+
+  STA $020b ; tile 2
+  STA $0217 ; tile 5
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+
+  RTS
 .endproc
 
 .segment "VECTORS"
@@ -193,18 +296,6 @@ palettes:
   .byte $31, $0d, $38, $16 ; fg 1 #AECBE9 #000000 #CDD083 #8C2C26
   .byte $31, $31, $31, $31 ; fg 2 #AECBE9 #AECBE9 #AECBE9 #AECBE9
   .byte $31, $31, $31, $31 ; fg 3 #AECBE9 #AECBE9 #AECBE9 #AECBE9
-
-flappybird_sprites:
-  .byte $70, $03, $00, $70
-  .byte $70, $01, $00, $78
-  .byte $70, $02, $00, $80
-  .byte $78, $10, $00, $70
-  .byte $78, $11, $00, $78
-  .byte $78, $12, $01, $80
-  ;       │    │    │    └── x-coord
-  ;       │    │    └─────── sprite attributes
-  ;       │    └──────────── tile number
-  ;       └───────────────── y-coord
 
 ppu_nametable_0_batch_0:
   .byte $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b
