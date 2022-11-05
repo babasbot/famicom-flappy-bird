@@ -188,7 +188,7 @@ palettes:
   .byte $31, $3a, $29, $19 ; bg 0 #AECBE9 #B4DF98 #87C03A #3E6F1D
   .byte $31, $19, $27, $37 ; bg 1 #AECBE9 #87C03A #CA8A3A #DFC497
   .byte $31, $3a, $19, $3b ; bg 2 #AECBE9 #B4DF98 #3E6F1D #A8DFB7
-  .byte $31, $20, $19, $31 ; bg 3 #AECBE9 #ECEEEC #3E6F1D #AECBE9
+  .byte $31, $20, $19, $3a ; bg 3 #AECBE9 #ECEEEC #3E6F1D #B4DF98
 
   .byte $31, $0d, $30, $38 ; fg 0 #AECBE9 #000000 #ECEEEC #CDD083
   .byte $31, $0d, $38, $16 ; fg 1 #AECBE9 #000000 #CDD083 #8C2C26
