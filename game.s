@@ -195,16 +195,16 @@ palettes:
   .byte $31, $31, $31, $31 ; fg 3 #AECBE9 #AECBE9 #AECBE9 #AECBE9
 
 flappybird_sprites:
-.byte $70, $00, $00, $70
-.byte $70, $01, $00, $78
-.byte $70, $02, $00, $80
-.byte $78, $10, $00, $70
-.byte $78, $11, $00, $78
-.byte $78, $12, $01, $80
-;       │    │    │    └── x-coord
-;       │    │    └─────── sprite attributes
-;       │    └──────────── tile number
-;       └───────────────── y-coord
+  .byte $70, $03, $00, $70
+  .byte $70, $01, $00, $78
+  .byte $70, $02, $00, $80
+  .byte $78, $10, $00, $70
+  .byte $78, $11, $00, $78
+  .byte $78, $12, $01, $80
+  ;       │    │    │    └── x-coord
+  ;       │    │    └─────── sprite attributes
+  ;       │    └──────────── tile number
+  ;       └───────────────── y-coord
 
 ppu_nametable_0_batch_0:
   .byte $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b
