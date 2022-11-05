@@ -153,7 +153,7 @@ write_ppu_attribute_table_namespace_0:
   LDA ppu_attribute_table,X
   STA PPU_DATA
   INX
-  CPX #$2020
+  CPX #$20
   BNE write_ppu_attribute_table_namespace_0
 
 LDA PPU_STAT
