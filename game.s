@@ -14,6 +14,9 @@
   .byte $0                             ; NROM
   .byte $0, $0, $0, $0, $0, $0, $0, $0 ; Unused padding
 
+.segment "ZEROPAGE"
+  flappybird_y_coord: .res 1
+
 .segment "CODE"
 
 .proc irq_handler
@@ -37,6 +40,12 @@
   STX PPU_CTRL
   STX PPU_MASK
 
+  ;
+  ; Initialize zero-page
+  ;
+
+  LDA $70
+  STA flappybird_y_coord
 
   JMP main
 .endproc
