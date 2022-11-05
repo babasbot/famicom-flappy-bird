@@ -53,16 +53,9 @@ end_nmi:
   LDX #$00
   STX PPU_CTRL
   STX PPU_MASK
-.endproc
 
-.proc draw_flappybird
-  LDX #$00
-  draw_sprites:
-    LDA flappybird_sprites,X
-    STA $0200,X
-    INX
-    CPX #$18
-    BNE draw_sprites
+
+  JMP main
 .endproc
 
 .proc main
@@ -172,6 +165,29 @@ write_ppu_attribute_table_namespace_1:
   CPX #$20
   BNE write_ppu_attribute_table_namespace_1
 
+
+;
+; draws FlappyBird in its initial position
+;
+;
+
+LDX #$00
+
+draw_flappybird:
+  LDA flappybird_sprites,X
+  STA $0200,X
+  INX
+  CPX #$18
+  BNE draw_flappybird
+
+vblank_wait:       ; wait for another vblank before continuing
+  BIT PPU_STAT
+  BPL vblank_wait
+
+  LDA #%10010000  ; turn on NMIs, sprites use first pattern table
+  STA PPU_CTRL
+  LDA #%00011110  ; turn on screen
+  STA PPU_MASK
 
 forever:
   JMP forever
