@@ -29,8 +29,9 @@
   LDA #$02
   STA OAM_DMA
 
-  RTI
+  JSR update_flappybird
 
+  RTI
 .endproc
 
 .proc reset_handler
@@ -278,6 +279,42 @@ forever:
 
   STA $020b ; tile 2
   STA $0217 ; tile 5
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+
+  RTS
+.endproc
+
+.proc update_flappybird
+  PHP
+  PHA
+  TXA
+  PHA;
+  TYA
+  PHA;
+
+  LDA flappybird_y_coord
+
+  CLC
+  ADC #$02
+
+  STA flappybird_y_coord
+
+  STA $0200 ; update tile 0
+  STA $0204 ; update tile 1
+  STA $0208 ; update tile 2
+
+  CLC
+  ADC #$08
+
+  STA $020c ; update tile 3
+  STA $0210 ; update tile 4
+  STA $0214 ; update tile 5
 
   PLA
   TAY
