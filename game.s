@@ -26,25 +26,8 @@
   LDA #$02
   STA OAM_DMA
 
-gravity:
-  LDY $0200
-  CPY #$d8
-  BCS end_nmi
-
-  TYA
-  ADC #3
-  STA $0200
-  STA $0204
-  STA $0208
-
-  LDA $020c
-  ADC #3
-  STA $020c
-  STA $0210
-  STA $0214
-
-end_nmi:
   RTI
+
 .endproc
 
 .proc reset_handler
