@@ -149,12 +149,29 @@ STA PPU_ADDR
 
 LDX #$00
 
-write_ppu_attribute_table:
+write_ppu_attribute_table_namespace_0:
   LDA ppu_attribute_table,X
   STA PPU_DATA
   INX
-  CPX #$18
-  BNE write_ppu_attribute_table
+  CPX #$20
+  BNE write_ppu_attribute_table_namespace_0
+
+LDA PPU_STAT
+
+LDA #$27
+STA PPU_ADDR
+LDA #$e8
+STA PPU_ADDR
+
+LDX #$00
+
+write_ppu_attribute_table_namespace_1:
+  LDA ppu_attribute_table,X
+  STA PPU_DATA
+  INX
+  CPX #$20
+  BNE write_ppu_attribute_table_namespace_1
+
 
 forever:
   JMP forever
@@ -238,7 +255,7 @@ ppu_nametable_1_batch_1:
   .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04 ; $23ax
   .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04 ; $23bx
 
-
+ppu_attribute_table:
   ; 76 54 32 10
   ; || || || ||
   ; || || || ++-- top left palette
@@ -254,32 +271,41 @@ ppu_nametable_1_batch_1:
   ;
   ; See: https://www.nesdev.org/wiki/PPU_attribute_tables
 
-  .byte %11111111 ; $23e8
-  .byte %11111111 ; $23e9
-  .byte %11111111 ; $23ea
-  .byte %11111111 ; $23eb
-  .byte %11111111 ; $23ec
-  .byte %11111111 ; $23ed
-  .byte %11111111 ; $23ee
-  .byte %11111111 ; $23ef
+  .byte %11111111 ; $2fe8
+  .byte %11111111 ; $2fe9
+  .byte %11111111 ; $2fea
+  .byte %11111111 ; $2feb
+  .byte %11111111 ; $2fec
+  .byte %11111111 ; $2fed
+  .byte %11111111 ; $2fee
+  .byte %11111111 ; $2fef
 
-  .byte %00000000 ; $23f0
-  .byte %00000000 ; $23f1
-  .byte %00000000 ; $23f2
-  .byte %00000000 ; $23f3
-  .byte %00000000 ; $23f4
-  .byte %00000000 ; $23f5
-  .byte %00000000 ; $23f6
-  .byte %00000000 ; $23f7
+  .byte %00001111 ; $2ff0
+  .byte %00001111 ; $2ff1
+  .byte %00001111 ; $2ff2
+  .byte %00001111 ; $2ff3
+  .byte %00001111 ; $2ff4
+  .byte %00001111 ; $2ff5
+  .byte %00001111 ; $2ff6
+  .byte %00001111 ; $2ff7
 
-  .byte %01010101 ; $23f8
-  .byte %01010101 ; $23f9
-  .byte %01010101 ; $23fa
-  .byte %01010101 ; $23fb
-  .byte %01010101 ; $23fc
-  .byte %01010101 ; $23fd
-  .byte %01010101 ; $23fe
-  .byte %01010101 ; $23ff
+  .byte %01010101 ; $2ff8
+  .byte %01010101 ; $2ff9
+  .byte %01010101 ; $2ffa
+  .byte %01010101 ; $2ffb
+  .byte %01010101 ; $2ffc
+  .byte %01010101 ; $2ffd
+  .byte %01010101 ; $2ffe
+  .byte %01010101 ; $2fff
+
+  .byte %01010101 ; $2300
+  .byte %01010101 ; $2301
+  .byte %01010101 ; $2302
+  .byte %01010101 ; $2303
+  .byte %01010101 ; $2304
+  .byte %01010101 ; $2305
+  .byte %01010101 ; $2306
+  .byte %01010101 ; $2307
 
 .segment "CHR"
 .incbin "graphics.chr"
