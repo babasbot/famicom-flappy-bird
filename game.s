@@ -300,6 +300,9 @@ forever:
 
   LDA flappybird_y_coord
 
+  CMP #$bd
+  BCS exit_routine ; Exit routine if FlappyBird hit the floor
+
   CLC
   ADC #$02
 
@@ -315,6 +318,8 @@ forever:
   STA $020c ; update tile 3
   STA $0210 ; update tile 4
   STA $0214 ; update tile 5
+
+exit_routine:
 
   PLA
   TAY
