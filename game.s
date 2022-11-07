@@ -16,6 +16,8 @@
 
 .segment "ZEROPAGE"
   flappybird_y_coord: .res 1
+  ppu_ctrl_settings: .res 1
+  scroll: .res 1
 
 .segment "CODE"
 
@@ -30,6 +32,7 @@
   STA OAM_DMA
 
   JSR update_flappybird
+  JSR scroll_screen
 
   RTI
 .endproc
@@ -47,6 +50,12 @@
 
   LDA #$70
   STA flappybird_y_coord
+
+  LDA #%10010000
+  STA ppu_ctrl_settings
+
+  LDA #$00
+  STA scroll
 
   JMP main
 .endproc
@@ -300,7 +309,7 @@ forever:
 
   LDA flappybird_y_coord
 
-  CMP #$bd
+  CMP #$b8
   BCS exit_routine ; Exit routine if FlappyBird hit the floor
 
   CLC
@@ -320,6 +329,48 @@ forever:
   STA $0214 ; update tile 5
 
 exit_routine:
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+
+  RTS
+.endproc
+
+.proc scroll_screen
+  PHP
+  PHA
+  TXA
+  PHA;
+  TYA
+  PHA;
+
+  LDA scroll
+  CMP #$ff
+  BNE set_scroll
+
+flip_nametable:
+  LDA ppu_ctrl_settings
+  EOR #%00000010
+  STA ppu_ctrl_settings
+  STA PPU_CTRL
+
+  LDA #$0f
+  STA scroll
+
+set_scroll:
+  INC scroll
+
+  ; set x-scroll
+  LDA scroll
+  STA PPU_SCROLL
+
+  ; set y-scroll
+  LDA #$00
+  STA PPU_SCROLL
 
   PLA
   TAY
