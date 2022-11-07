@@ -309,7 +309,15 @@ forever:
   PHA;
 
   LDA flappybird_y_coord
+  CMP #$04
+  BCS update_flappybird_y_coord
 
+  LDA #$04
+  STA flappybird_y_coord
+
+  JMP exit_routine
+
+update_flappybird_y_coord:
   CMP #$b8
   BCS exit_routine ; Exit routine if FlappyBird hit the floor
 
