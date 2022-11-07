@@ -349,6 +349,10 @@ exit_routine:
   TYA
   PHA;
 
+  LDA flappybird_y_coord
+  CMP #$b8
+  BCS end_of_scroll_subroutine ; Stop scrolling if FlappyBird hits the floor
+
   LDA scroll
   CMP #$ff
   BNE set_scroll
@@ -373,6 +377,7 @@ set_scroll:
   LDA #$00
   STA PPU_SCROLL
 
+end_of_scroll_subroutine:
   PLA
   TAY
   PLA
