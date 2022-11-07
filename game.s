@@ -31,6 +31,7 @@
   LDA #$02
   STA OAM_DMA
 
+  JSR read_controller
   JSR update_flappybird
   JSR scroll_screen
 
@@ -381,6 +382,61 @@ set_scroll:
 
   RTS
 .endproc
+
+.proc read_controller
+  PHP
+  PHA
+  TXA
+  PHA;
+  TYA
+  PHA;
+
+  LDA #$01
+  STA JOY_1
+  LDA #$00
+  STA JOY_1
+
+read_a_button:
+  LDA JOY_1
+  AND #%00000001
+  BEQ read_b_button
+
+  LDA flappybird_y_coord
+  CLC
+  SBC #$03
+  STA flappybird_y_coord
+
+read_b_button:
+  LDA JOY_1
+
+read_select_button:
+  LDA JOY_1
+
+read_start_button:
+  LDA JOY_1
+
+read_up_button:
+  LDA JOY_1
+
+read_down_button:
+  LDA JOY_1
+
+read_left_button:
+  LDA JOY_1
+
+read_right_button:
+  LDA JOY_1
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+
+  RTS
+.endproc
+
 
 .segment "VECTORS"
 .word nmi_handler
