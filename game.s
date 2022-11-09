@@ -16,8 +16,9 @@
 
 .segment "ZEROPAGE"
   flappybird_y_coord: .res 1
-  ppu_ctrl_settings: .res 1
-  scroll: .res 1
+  ppu_ctrl_settings:  .res 1
+  scroll:             .res 1
+  pipe_position:      .res 1
 
 .segment "CODE"
 
@@ -57,6 +58,9 @@
 
   LDA #$00
   STA scroll
+
+  LDA #$a0
+  STA pipe_position
 
   JMP main
 .endproc
@@ -169,6 +173,7 @@ write_ppu_attribute_table_namespace_1:
   BNE write_ppu_attribute_table_namespace_1
 
 JSR draw_flappybird
+JSR spawn_pipe
 
 vblank_wait:       ; wait for another vblank before continuing
   BIT PPU_STAT
@@ -181,6 +186,180 @@ vblank_wait:       ; wait for another vblank before continuing
 
 forever:
   JMP forever
+.endproc
+
+.proc spawn_pipe
+  PHP
+  PHA
+  TXA
+  PHA;
+  TYA
+  PHA;
+
+  ;
+  ; pipe base sprite 0
+  ;
+
+  LDA #$bd          ; y-coord
+  STA $0218
+
+  LDA #$24          ; tile number
+  STA $0219
+
+  LDA #%00000010    ; sprite attributes
+  STA $021a
+
+  LDA pipe_position ; y-coord
+  STA $021b
+
+  ;
+  ; pipe base sprite 1
+  ;
+
+  LDA #$bd          ; y-coord
+  STA $021c
+
+  LDA #$25          ; tile number
+  STA $021d
+
+  LDA #%00000010    ; sprite attributes
+  STA $021e
+
+  LDA pipe_position ; y-coord
+  CLC
+  ADC #$08
+  STA $021f
+
+  ;
+  ; pipe base sprite 2
+  ;
+
+  LDA #$bd          ; y-coord
+  STA $0220
+
+  LDA #$26          ; tile number
+  STA $0221
+
+  LDA #%00000010    ; sprite attributes
+  STA $0222
+
+  LDA pipe_position ; y-coord
+  CLC
+  ADC #$10
+  STA $0223
+
+  ;
+  ; pipe middle sprite 0
+  ;
+
+  LDA #$b5          ; y-coord
+  STA $0224
+
+  LDA #$14          ; tile number
+  STA $0225
+
+  LDA #%00000010    ; sprite attributes
+  STA $0226
+
+  LDA pipe_position ; y-coord
+  STA $0227
+
+  ;
+  ; pipe middle sprite 1
+  ;
+
+  LDA #$b5          ; y-coord
+  STA $0228
+
+  LDA #$15          ; tile number
+  STA $0229
+
+  LDA #%00000010    ; sprite attributes
+  STA $022a
+
+  LDA pipe_position ; y-coord
+  CLC
+  ADC #$08
+  STA $022b
+
+  ;
+  ; pipe middle sprite 2
+  ;
+
+  LDA #$b5          ; y-coord
+  STA $022c
+
+  LDA #$16          ; tile number
+  STA $022d
+
+  LDA #%00000010    ; sprite attributes
+  STA $022e
+
+  LDA pipe_position ; y-coord
+  CLC
+  ADC #$10
+  STA $022f
+
+  ;
+  ; pipe top sprite 0
+  ;
+
+  LDA #$ad          ; y-coord
+  STA $0230
+
+  LDA #$04          ; tile number
+  STA $0231
+
+  LDA #%00000010    ; sprite attributes
+  STA $0232
+
+  LDA pipe_position ; y-coord
+  STA $0233
+
+  ;
+  ; pipe top sprite 1
+  ;
+
+  LDA #$ad          ; y-coord
+  STA $0234
+
+  LDA #$05          ; tile number
+  STA $0235
+
+  LDA #%00000010    ; sprite attributes
+  STA $0236
+
+  LDA pipe_position ; y-coord
+  CLC
+  ADC #$08
+  STA $0237
+
+  ;
+  ; pipe top sprite 2
+  ;
+
+  LDA #$ad          ; y-coord
+  STA $0238
+
+  LDA #$06          ; tile number
+  STA $0239
+
+  LDA #%00000010    ; sprite attributes
+  STA $023a
+
+  LDA pipe_position ; y-coord
+  CLC
+  ADC #$10
+  STA $023b
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+
+  RTS
 .endproc
 
 .proc draw_flappybird
@@ -466,7 +645,7 @@ palettes:
 
   .byte $31, $0d, $30, $38 ; fg 0 #AECBE9 #000000 #ECEEEC #CDD083
   .byte $31, $0d, $38, $16 ; fg 1 #AECBE9 #000000 #CDD083 #8C2C26
-  .byte $31, $31, $31, $31 ; fg 2 #AECBE9 #AECBE9 #AECBE9 #AECBE9
+  .byte $31, $39, $29, $19 ; fg 2 #AECBE9
   .byte $31, $31, $31, $31 ; fg 3 #AECBE9 #AECBE9 #AECBE9 #AECBE9
 
 ppu_nametable_0_batch_0:
