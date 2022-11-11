@@ -64,7 +64,7 @@
   LDA #$a0
   STA pipe_position
 
-  LDA #$01
+  LDA #$04
   STA pipe_height
 
   LDA #$00
@@ -223,117 +223,18 @@ forever:
 
   TAX ; store the calculation on the X register to reuse it later...
 
-  LDA #$ad          ; y-coord
-  STA $0218
-
-  LDA #$04          ; tile number
-  STA $0219
-
-  LDA #%00000010    ; sprite attributes
-  STA $021a
-
-  LDA pipe_position ; x-coord
-  STA $021b
-
-  ;
-  ; pipe top sprite 1
-  ;
-
-  TXA               ; y-coord
-  STA $021c
-
-  LDA #$05          ; tile number
-  STA $021d
-
-  LDA #%00000010    ; sprite attributes
-  STA $021e
-
-  LDA pipe_position ; x-coord
-  CLC
-  ADC #$08
-  STA $021f
-
-  ;
-  ; pipe top sprite 2
-  ;
-
-  TXA               ; y-coord
-  STA $0220
-
-  LDA #$06          ; tile number
-  STA $0221
-
-  LDA #%00000010    ; sprite attributes
-  STA $0222
-
-  LDA pipe_position ; x-coord
-  CLC
-  ADC #$10
-  STA $0223
-
-  ;
-  ; pipe middle sprite 0
-  ;
-
-  TXA
-  CLC
-  ADC #$08
-  TAX ; store the calculation on the X register to reuse it later...
-
-  STA $0224         ; y-coord
-
-  LDA #$14          ; tile number
-  STA $0225
-
-  LDA #%00000010    ; sprite attributes
-  STA $0226
-
-  LDA pipe_position ; x-coord
-  STA $0227
-
-  ;
-  ; pipe middle sprite 1
-  ;
-
-  TXA               ; y-coord
-  STA $0228
-
-  LDA #$15          ; tile number
-  STA $0229
-
-  LDA #%00000010    ; sprite attributes
-  STA $022a
-
-  LDA pipe_position ; x-coord
-  CLC
-  ADC #$08
-  STA $022b
-
-  ;
-  ; pipe middle sprite 2
-  ;
-
-  TXA               ; y-coord
-  STA $022c
-
-  LDA #$16          ; tile number
-  STA $022d
-
-  LDA #%00000010    ; sprite attributes
-  STA $022e
-
-  LDA pipe_position ; x-coord
-  CLC
-  ADC #$10
-  STA $022f
-
-  LDY $00
+  LDY #$00
   STY pipe_height_counter
 
 pipe_height_loop:
+  INC pipe_height_counter
+
   TXA
-  CLC
-  ADC #$08
+  ; CLC
+  ; ADC #$08
+  SEC
+  SBC #$08
+
   TAX ; store the calculation on the X register to reuse it later...
 
   ;
@@ -399,10 +300,121 @@ pipe_height_loop:
   STA PIPE_ADDR,Y
   INY
 
-  INC pipe_height_counter
   LDA pipe_height_counter
   CMP pipe_height
   BNE pipe_height_loop
+
+  ;
+  ; pipe middle sprite 0
+  ;
+
+  TXA
+  SEC
+  SBC #$08
+  TAX ; store the calculation on the X register to reuse it later...
+
+  STA $0224         ; y-coord
+
+  LDA #$14          ; tile number
+  STA $0225
+
+  LDA #%00000010    ; sprite attributes
+  STA $0226
+
+  LDA pipe_position ; x-coord
+  STA $0227
+
+  ;
+  ; pipe middle sprite 1
+  ;
+
+  TXA               ; y-coord
+  STA $0228
+
+  LDA #$15          ; tile number
+  STA $0229
+
+  LDA #%00000010    ; sprite attributes
+  STA $022a
+
+  LDA pipe_position ; x-coord
+  CLC
+  ADC #$08
+  STA $022b
+
+  ;
+  ; pipe middle sprite 2
+  ;
+
+  TXA               ; y-coord
+  STA $022c
+
+  LDA #$16          ; tile number
+  STA $022d
+
+  LDA #%00000010    ; sprite attributes
+  STA $022e
+
+  LDA pipe_position ; x-coord
+  CLC
+  ADC #$10
+  STA $022f
+
+  ;
+  ; pipe top sprite 0
+  ;
+
+  TXA
+  SEC
+  SBC #$08
+  TAX
+
+  STA $0218         ; y-coord
+
+  LDA #$04          ; tile number
+  STA $0219
+
+  LDA #%00000010    ; sprite attributes
+  STA $021a
+
+  LDA pipe_position ; x-coord
+  STA $021b
+
+  ;
+  ; pipe top sprite 1
+  ;
+
+  TXA
+  STA $021c         ; y-coord
+
+  LDA #$05          ; tile number
+  STA $021d
+
+  LDA #%00000010    ; sprite attributes
+  STA $021e
+
+  LDA pipe_position ; x-coord
+  CLC
+  ADC #$08
+  STA $021f
+
+  ;
+  ; pipe top sprite 2
+  ;
+
+  TXA               ; y-coord
+  STA $0220
+
+  LDA #$06          ; tile number
+  STA $0221
+
+  LDA #%00000010    ; sprite attributes
+  STA $0222
+
+  LDA pipe_position ; x-coord
+  CLC
+  ADC #$10
+  STA $0223
 
   PLA
   TAY
