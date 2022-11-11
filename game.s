@@ -204,23 +204,11 @@ forever:
   TYA
   PHA;
 
-  ; $ad := 173
-  ; $95 := 149 <- base
-  ;
-  ; 173 = (1 * 8) + 16 + 149
-
   ;
   ; pipe top sprite 0
   ;
 
-  ; (height x 8) + 165
-  LDA pipe_height
-  ASL
-  ASL
-  ASL
-  CLC
-  ADC #$a5
-
+  LDA #$c5
   TAX ; store the calculation on the X register to reuse it later...
 
   LDY #$00
@@ -230,8 +218,6 @@ pipe_height_loop:
   INC pipe_height_counter
 
   TXA
-  ; CLC
-  ; ADC #$08
   SEC
   SBC #$08
 
