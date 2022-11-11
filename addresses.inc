@@ -10,3 +10,4 @@ PPU_DATA   = $2007
 OAM_DMA    = $4014
 JOY_1      = $4016
 
+PIPE_ADDR  = $0230
