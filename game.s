@@ -64,7 +64,7 @@
   LDA #$a0
   STA pipe_position
 
-  LDA #$04
+  LDA #$06
   STA pipe_height
 
   LDA #$00
@@ -92,96 +92,8 @@ write_palette:
   CPX #$20
   BNE write_palette
 
-;
-; Write the PPU name table 0
-;
-
-LDA PPU_STAT
-
-LDA #$22
-STA PPU_ADDR
-LDA #$40
-STA PPU_ADDR
-
-LDX #$00
-
-write_ppu_nametable_0_batch_0:
-  LDA ppu_nametable_0_batch_0, X
-  STA PPU_DATA
-  INX
-  BNE write_ppu_nametable_0_batch_0
-
-write_ppu_nametable_0_batch_1:
-  LDA ppu_nametable_0_batch_1,X
-  STA PPU_DATA
-  INX
-  CPX #$80
-  BNE write_ppu_nametable_0_batch_1
-
-;
-; Write the PPU nametable 1
-;
-
-LDA PPU_STAT
-
-LDA #$26
-STA PPU_ADDR
-LDA #$40
-STA PPU_ADDR
-
-LDX #$00
-
-write_ppu_nametable_1_batch_0:
-  LDA ppu_nametable_1_batch_0,X
-  STA PPU_DATA
-  INX
-  BNE write_ppu_nametable_1_batch_0
-
-write_ppu_nametable_1_batch_1:
-  LDA ppu_nametable_1_batch_1,X
-  STA PPU_DATA
-  INX
-  CPX #$80
-  BNE write_ppu_nametable_1_batch_1
-
-;
-; Write the PPU attribute table
-;
-
-LDA PPU_STAT
-
-LDA #$23
-STA PPU_ADDR
-LDA #$e0
-STA PPU_ADDR
-
-LDX #$00
-
-write_ppu_attribute_table_namespace_0:
-  LDA ppu_attribute_table,X
-  STA PPU_DATA
-  INX
-  CPX #$20
-  BNE write_ppu_attribute_table_namespace_0
-
-LDA PPU_STAT
-
-LDA #$27
-STA PPU_ADDR
-LDA #$e0
-STA PPU_ADDR
-
-LDX #$00
-
-write_ppu_attribute_table_namespace_1:
-  LDA ppu_attribute_table,X
-  STA PPU_DATA
-  INX
-  CPX #$20
-  BNE write_ppu_attribute_table_namespace_1
-
-JSR draw_flappybird
-JSR spawn_pipe
+JSR draw_floor_tiles
+JSR write_attribute_table
 
 vblank_wait:       ; wait for another vblank before continuing
   BIT PPU_STAT
@@ -586,9 +498,9 @@ exit_routine:
   TYA
   PHA;
 
-  LDA flappybird_y_coord
-  CMP #$b8
-  BCS end_of_scroll_subroutine ; Stop scrolling if FlappyBird hits the floor
+  ; LDA flappybird_y_coord
+  ; CMP #$b8
+  ; BCS end_of_scroll_subroutine ; Stop scrolling if FlappyBird hits the floor
 
   LDA scroll
   CMP #$ff
@@ -596,11 +508,10 @@ exit_routine:
 
 flip_nametable:
   LDA ppu_ctrl_settings
-  EOR #%00000010
+  EOR #%00000001
   STA ppu_ctrl_settings
-  STA PPU_CTRL
 
-  LDA #$0f
+  LDA #$00
   STA scroll
 
 set_scroll:
@@ -613,6 +524,9 @@ set_scroll:
   ; set y-scroll
   LDA #$00
   STA PPU_SCROLL
+
+  LDA ppu_ctrl_settings
+  STA PPU_CTRL
 
 end_of_scroll_subroutine:
   PLA
@@ -679,6 +593,105 @@ read_right_button:
   RTS
 .endproc
 
+.proc draw_floor_tiles
+  PHP
+  PHA
+  TXA
+  PHA;
+  TYA
+  PHA;
+
+  LDA PPU_STAT
+
+  LDA #$23
+  STA PPU_ADDR
+  LDA #$00
+  STA PPU_ADDR
+
+  LDX #$00
+
+write_nametable_0:
+  LDA floor_tiles,X
+  STA PPU_DATA
+  INX
+  CPX #$c0
+  BNE write_nametable_0
+
+  LDA PPU_STAT
+
+  LDA #$27
+  STA PPU_ADDR
+  LDA #$00
+  STA PPU_ADDR
+
+  LDX #$00
+
+write_nametable_1:
+  LDA floor_tiles,X
+  STA PPU_DATA
+  INX
+  CPX #$c0
+  BNE write_nametable_1
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+
+  RTS
+.endproc
+
+.proc write_attribute_table
+  PHP
+  PHA
+  TXA
+  PHA;
+  TYA
+  PHA;
+
+  LDA PPU_STAT
+
+  LDA #$23
+  STA PPU_ADDR
+  LDA #$c0
+  STA PPU_ADDR
+
+  LDX #$00
+
+write_nametable_0_attributes:
+  LDA attribute_table,X
+  STA PPU_DATA
+  INX
+  CPX #$50
+  BNE write_nametable_0_attributes
+
+  LDA PPU_STAT
+
+  LDA #$27
+  STA PPU_ADDR
+  LDA #$c0
+  STA PPU_ADDR
+
+  LDX #$00
+
+write_nametable_1_attributes:
+  LDA attribute_table,X
+  STA PPU_DATA
+  INX
+  CPX #$50
+  BNE write_nametable_1_attributes
+
+  PLA
+  TAY
+  PLA
+  TAX
+  PLA
+  PLP
+
+  RTS
+.endproc
 
 .segment "VECTORS"
 .word nmi_handler
@@ -698,65 +711,27 @@ palettes:
   .byte $31, $39, $29, $19 ; fg 2 #AECBE9
   .byte $31, $31, $31, $31 ; fg 3 #AECBE9 #AECBE9 #AECBE9 #AECBE9
 
-ppu_nametable_0_batch_0:
-  .byte $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b
-  .byte $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b, $1c
-  .byte $15, $15, $1e, $0f, $1f, $15, $15, $1e, $0f, $1f, $15, $15, $1e, $0f, $1f, $15
-  .byte $15, $1e, $0f, $1f, $15, $15, $1e, $0f, $1f, $15, $15, $1e, $0f, $1f, $15, $15
-  .byte $15, $15, $06, $07, $08, $0e, $15, $06, $07, $08, $0e, $15, $06, $07, $08, $0e
-  .byte $15, $06, $07, $08, $0e, $15, $06, $07, $08, $0e, $15, $06, $07, $08, $0e, $15
-  .byte $15, $16, $17, $18, $19, $1a, $16, $17, $18, $19, $1a, $16, $17, $18, $19, $1a
-  .byte $16, $17, $18, $19, $1a, $16, $17, $18, $19, $1a, $16, $17, $18, $19, $1a, $16
-  .byte $09, $0a, $0b, $0c, $0d, $09, $0a, $0b, $0c, $0d, $09, $0a, $0b, $0c, $0d, $09
-  .byte $0a, $0b, $0c, $0d, $09, $0a, $0b, $0c, $0d, $09, $0a, $0b, $0c, $0d, $09, $0a
-  .byte $04, $04, $04 ,$04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $04, $04, $04 ,$04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $05, $05, $05 ,$05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05
-  .byte $05, $05, $05 ,$05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05
+floor_tiles:
+  .byte $05, $05, $05 ,$05, $10, $11, $12, $13, $05, $05, $05, $05, $05, $05, $05, $05
+  .byte $05, $05, $05 ,$05, $10, $11, $12, $13, $05, $05, $05, $05, $05, $05, $05, $05
+
   .byte $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02
   .byte $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02
 
-ppu_nametable_0_batch_1:
   .byte $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03
   .byte $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03
-  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
+
   .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
   .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
 
-ppu_nametable_1_batch_0:
-  .byte $00, $00, $00, $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b, $1c, $00
-  .byte $00, $00, $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00, $00, $1b, $1c, $00, $00
-  .byte $1e, $0f, $1f, $15, $15, $1e, $0f, $1f, $15, $15, $1e, $0f, $1f, $15, $15, $1e
-  .byte $0f, $1f, $15, $15, $1e, $0f, $1f, $15, $15, $1e, $0f, $1f, $15, $15, $1e, $0f
-  .byte $06, $07, $08, $0e, $15, $06, $07, $08, $0e, $15, $06, $07, $08, $0e, $15, $06
-  .byte $07, $08, $0e, $15, $06, $07, $08, $0e, $15, $06, $07, $08, $0e, $15, $06, $07
-  .byte $17, $18, $19, $1a, $16, $17, $18, $19, $1a, $16, $17, $18, $19, $1a, $16, $17
-  .byte $18, $19, $1a, $16, $17, $18, $19, $1a, $16, $17, $18, $19, $1a, $16, $17, $18
-  .byte $0b, $0c, $0d, $09, $0a, $0b, $0c, $0d, $09, $0a, $0b, $0c, $0d, $09, $0a, $0b
-  .byte $0c, $0d, $09, $0a, $0b, $0c, $0d, $09, $0a, $0b, $0c, $0d, $09, $0a, $0b, $0c
-  .byte $04, $04, $04 ,$04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $04, $04, $04 ,$04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $05, $05, $05 ,$05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05
-  .byte $05, $05, $05 ,$05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05, $05
-  .byte $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02
-  .byte $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02, $01, $02
-
-ppu_nametable_1_batch_1:
-  .byte $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03
-  .byte $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03, $03
-  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
-  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
   .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
   .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
 
+  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
+  .byte $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04, $04
 
-ppu_attribute_table:
-  ; 76 54 32 10
+attribute_table:
+  ; xx xx xx xx
   ; || || || ||
   ; || || || ++-- top left palette
   ; || || ++----- top right palette
@@ -771,23 +746,59 @@ ppu_attribute_table:
   ;
   ; See: https://www.nesdev.org/wiki/PPU_attribute_tables
   ;
-  .byte %11110000
-  .byte %11110000
-  .byte %11110000
-  .byte %11110000
-  .byte %11110000
-  .byte %11110000
-  .byte %11110000
-  .byte %11110000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
 
-  .byte %11111111
-  .byte %11111111
-  .byte %11111111
-  .byte %11111111
-  .byte %11111111
-  .byte %11111111
-  .byte %11111111
-  .byte %11111111
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
+  .byte %00000000
 
   .byte %01010000
   .byte %01010000
